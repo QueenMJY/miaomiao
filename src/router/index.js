@@ -14,7 +14,7 @@ const routes = [
     path:'/*',
     redirect:'/movie'
   }
-
+  //当其他路由不匹配时会使用该路由
 ]
 
 const router = new VueRouter({
