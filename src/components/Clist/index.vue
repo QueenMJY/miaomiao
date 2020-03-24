@@ -1,7 +1,8 @@
 <template>
    <div class="cinema_body">
 				<ul>
-					<li>
+					
+					<!-- <li>
 						<div>
 							<span>大地影院(澳东世纪店)</span>
 							<span class="q"><span class="price">22.9</span> 元起</span>
@@ -70,19 +71,19 @@
                 			<div>小吃</div>
                 			<div>折扣卡</div>
        					</div>
-					</li>
-					<li>
+					</li> -->
+					<li v-for="item in cinemaList" :Key="item.id">
 						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
+							<span>{{item.nm}}</span>
+							<span class="q"><span class="price">{{item.sellPrice}}</span> 元起</span>
 						</div>
 						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
+							<span>{{item.addr}}</span>
+							<span>{{item.distance}}</span>
 						</div>
 						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
+                			<div v-for="(num,key) in item.tag"  v-if="num===1" :key="key" :class="key|classCard">{{ key | formateCard}}</div>
+                			
        					</div>
 					</li>
 				</ul>
@@ -90,7 +91,53 @@
 </template>
 <script>
 export default {
-    
+	name:'Clist',
+	data(){
+		return{
+			cinemaList:[]
+		}
+		
+	},
+	mounted(){
+		this.axios.get('/ajax/cinemaList?day=2019-12-10&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1575948234197&cityId=1&optimus_uuid=E5B867D0127611EA82BB8DCFE65B145C60BDC5FFC8DD4539B2A9FCC298AD453B&optimus_risk_level=71&optimus_code=10').then((res)=>{
+			 var msg = res.statusText;//数据里的请求状态切记大写
+			 if(msg==="OK"){
+				 this.cinemaList = res.data.cinemas;
+				 }
+			console.log(res)
+			
+		})
+	},
+	filters:{
+		formateCard(key){
+			var card = [
+				{key:'allowRefund',value : '改签'},
+				{key:'endorse',value:'退'},
+				{key:'sell',value:'折扣卡'},
+				{key:'snack',value:'小吃'},
+			]
+			for(var i=0;i<card.length;i++){
+				if(card[i].key===key){
+					return card[i].value
+				}
+			}
+			return '';
+		},
+		classCard(key){
+			var card = [
+				{key:'allowRefund',value : 'bl'},
+				{key:'endorse',value:'bl'},
+				{key:'sell',value:'or'},
+				{key:'snack',value:'or'},
+			]
+			for(var i=0;i<card.length;i++){
+				if(card[i].key===key){
+					return card[i].value
+				}
+			}
+			return '';
+		}
+	}
 }
 </script>
 <style scoped>
