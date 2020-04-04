@@ -1,5 +1,7 @@
 <template>
   <div class="movie_body">
+	  <Loading v-if="isLoading" />
+        <Scroller v-else>
 				<ul>
 					<!-- <li>
 						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
@@ -110,6 +112,7 @@
 						</div>
 					</li>
 				</ul>
+			  </Scroller>
 			</div>  
 </template>
 <script>
@@ -117,17 +120,29 @@ export default {
 	name:'CommingSoon',
 	data(){
 		return {
-			comingList:[]
+			comingList:[],
+			isLoading : true,
+            prevCityId : -1
 		}
 	},
-	mounted(){
-		this.axios.get('/ajax/comingList?ci=1&token=&limit=10&optimus_uuid=E5B867D0127611EA82BB8DCFE65B145C60BDC5FFC8DD4539B2A9FCC298AD453B&optimus_risk_level=71&optimus_code=10').then((res)=>{
+	activated(){
+		var cityId = this.$store.state.city.id;
+        if( this.prevCityId === cityId ){ return; }
+        this.isLoading = true;
+		this.axios.get('/ajax/comingList?ci='+cityId+'&token=&limit=10&optimus_uuid=E5B867D0127611EA82BB8DCFE65B145C60BDC5FFC8DD4539B2A9FCC298AD453B&optimus_risk_level=71&optimus_code=10').then((res)=>{
 			var msg  = res.statusText;
 			if(msg === "OK"){
 				this.comingList = res.data.coming;
+				this.isLoading = false;
+                this.prevCityId = cityId;
 			}
 			console.log(res)
 		})
+	},
+	methods:{
+		handleToDetail(movieId){
+            this.$router.push('/movie/detail/2/' + movieId);
+        }
 	}
 
 }
