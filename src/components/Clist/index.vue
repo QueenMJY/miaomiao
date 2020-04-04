@@ -1,5 +1,7 @@
 <template>
    <div class="cinema_body">
+	   <Loading v-if="isLoading" />
+        <Scroller v-else>
 				<ul>
 					
 					<!-- <li>
@@ -87,6 +89,7 @@
        					</div>
 					</li>
 				</ul>
+        </Scroller>
 			</div> 
 </template>
 <script>
@@ -94,17 +97,25 @@ export default {
 	name:'Clist',
 	data(){
 		return{
-			cinemaList:[]
+			cinemaList:[],
+			 isLoading : true,
+             prevCityId:-1
 		}
 		
 	},
 	mounted(){
-		this.axios.get('/ajax/cinemaList?day=2019-12-10&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1575948234197&cityId=1&optimus_uuid=E5B867D0127611EA82BB8DCFE65B145C60BDC5FFC8DD4539B2A9FCC298AD453B&optimus_risk_level=71&optimus_code=10').then((res)=>{
+		 var cityId = this.$store.state.city.id;
+         if( this.prevCityId === cityId ){ return; }
+		 this.isLoading = true;
+		 console.log(123)
+		this.axios.get('/ajax/cinemaList?day=2019-12-10&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1575948234197&cityId='+cityId+'&optimus_uuid=E5B867D0127611EA82BB8DCFE65B145C60BDC5FFC8DD4539B2A9FCC298AD453B&optimus_risk_level=71&optimus_code=10').then((res)=>{
 			 var msg = res.statusText;//数据里的请求状态切记大写
 			 if(msg==="OK"){
 				 this.cinemaList = res.data.cinemas;
+				  this.isLoading = false;
+                  this.prevCityId = cityId
 				 }
-			console.log(res)
+	
 			
 		})
 	},

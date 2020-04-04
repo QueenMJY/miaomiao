@@ -40,9 +40,23 @@ export default {
 			moviesList:[]
 		}
 	},
+	methods : {
+        cancelRequest(){
+            if(typeof this.source ==='function'){
+                this.source('终止请求')
+            }
+        }
+    },
 	watch:{
 		message(newVal){
-			this.axios.get('/api/searchList?cityId=10&kw='+newVal).then((res)=>{
+			var that = this;
+            var cityId = this.$store.state.city.id;
+            this.cancelRequest();
+			this.axios.get('/api/searchList?cityId='+cityId+'&kw='+newVal,{
+                cancelToken: new this.axios.CancelToken(function(c){
+                    that.source = c;
+                })
+            }).then((res)=>{
 				var msg = res.data.msg;
 				var movies = res.data.data.movies;
 				if(msg && movies){
@@ -50,7 +64,14 @@ export default {
 					this.moviesList = res.data.data.movies.list;
 					
 				}
-			});
+			}).catch((err) => {
+                if (this.axios.isCancel(err)) {
+                    console.log('Rquest canceled', err.message); //请求如果被取消，这里是返回取消的message
+                } else {
+                    //handle error
+                    console.log(err);
+                }
+            });
 		}
 	}
 }
